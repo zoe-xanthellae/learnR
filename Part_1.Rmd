@@ -1,0 +1,35 @@
+---
+title: 'Part 1: Explore'
+author: "ZS"
+date: "May 8, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Part 1: Explore
+## 2. Introduction
+1. Data Visualization
+2. Data Transformation
+3. Exploratory Data Analysis
+
+## 3. Data Visualization
+### 3.1 Introduction
+
+Using ggplot2, which uses grammar of graphics for describing and building graphs
+`r library(tidyverse)`
+
+### 3.2 First Steps
+Question: Do cars with big engines use more fuel than cars with small engines?
+  + is the relationship positive/negative, linear/nonlinear?
+  
+```{r echo=FALSE}
+library(ggplot2)
+
+mpg
+
+# To plot mpg
+ggplot(data = mpg) + # this line tells R to use the mpg dataset
+  geom_point(mapping = aes(x = displ, y = hwy)) # this line tells R to create a layer on the base plot, and what variable to plot on each axis
+```
