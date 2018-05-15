@@ -7,7 +7,18 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+install.packages("tidyverse"); 
+tidyverse_update()
+install.packages(c("nycflights13", "gapminder", "Lahman"))
 ```
+
+```{r packages echo=FALSE}
+library(tidyverse)
+library(nycflights13)
+library(gapminder)
+library(Lahman)
+```
+
 # Part 1: Explore
 ## 2. Introduction
 1. Data Visualization
@@ -24,12 +35,78 @@ Using ggplot2, which uses grammar of graphics for describing and building graphs
 Question: Do cars with big engines use more fuel than cars with small engines?
   + is the relationship positive/negative, linear/nonlinear?
   
-```{r echo=FALSE}
+```{r include=FALSE}
 library(ggplot2)
 
 mpg
+str(mpg)
 
 # To plot mpg
 ggplot(data = mpg) + # this line tells R to use the mpg dataset
   geom_point(mapping = aes(x = displ, y = hwy)) # this line tells R to create a layer on the base plot, and what variable to plot on each axis
+
+# So, really this is what you start with:
+# ggplot(data = <DATA>) +
+#   <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+
+# Plot hwy v cyl
+ggplot(data = mpg) + # this line tells R to use the mpg dataset
+  geom_point(mapping = aes(x = hwy, y = cyl))
+# From this graph, you might say that cars with more cylinders have a lower highway mpg, though the relationship is not linear
+
+# Plot class v drv
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = class, y = drv))
+# This graph is not useful, because there does not seem to be a clear relationship between type of car (class) and what drive (front/rear/awd)
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = drv, y = class))
+# Plotting this way is a bit better, but still not super useful
+```
+## 3.3 Aesthetic mappings
+To inform the graph of displ v hwy, we can add a third variable, like *class* to the two dimensional scatterplot by using an aesthetic. One way to think of this is if you were running a two-way ANOVA.
+
+Aesthetics include things like size, shape, or color of your points. The same way you think of values of data, think of "levels" of aesthetic settings.
+
+```{r}
+# Example: map the colors of your points to the "class" variable
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = class))
+# Here, you're mapping the name of the aesthetic to the variable inside aes()
+# ggplot2 automatically assigns a color/level to each unique value of the variable => "scaling"
+
+# We can do the same with scaling the class by size
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, size = class))
+
+# Mapping to alpha controls the transparency of the points
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
+
+# Here, mapping with shape, which can deal with a max of 6 values
+# If you're ever dealing with more than 6, consider using geom_point to map their levels manually
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, shape = class))
+
+# Rather than setting aesthetic by class, could set for all points on graph manually
+# Here the argument goes **outside** the aes() argument
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
+```
+*Setting aesthetic manually*: To do so, you'll need to pick a value that makes sense per that aesthetic
++ name of a color as a character string --> "blue"
++ size of a point in millimeters (mm)
++ shape of a point as a number (0-20)
+
+Exercises:
+1) Which variables in mpg are categorical v quantitative?
+`r ?mpg`
+  + Categorical: manufacturer, model, trans, drv, fl, class, cyl
+  + Quantitative: displ, year, cty, hwy
+2) Map continuous variable to color, size, and shape 
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = cty, y = hwy, color = year, stroke = displ))
+
+# Continuous variables cannot be mapped to shape, but color and size can!
+# Stroke is the outline/fill of the shape. Size determines the size of the filled part, and Stroke determines the size of the stroke outline
 ```
