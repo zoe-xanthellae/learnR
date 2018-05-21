@@ -12,7 +12,7 @@ tidyverse_update()
 install.packages(c("nycflights13", "gapminder", "Lahman"))
 ```
 
-```{r packages echo=FALSE}
+```{r Packages, echo=FALSE}
 library(tidyverse)
 library(nycflights13)
 library(gapminder)
@@ -35,7 +35,7 @@ Using ggplot2, which uses grammar of graphics for describing and building graphs
 Question: Do cars with big engines use more fuel than cars with small engines?
   + is the relationship positive/negative, linear/nonlinear?
   
-```{r include=FALSE}
+```{r Plotting Basics, include=FALSE}
 library(ggplot2)
 
 mpg
@@ -62,12 +62,12 @@ ggplot(data = mpg) +
   geom_point(mapping = aes(x = drv, y = class))
 # Plotting this way is a bit better, but still not super useful
 ```
-## 3.3 Aesthetic mappings
+### 3.3 Aesthetic mappings
 To inform the graph of displ v hwy, we can add a third variable, like *class* to the two dimensional scatterplot by using an aesthetic. One way to think of this is if you were running a two-way ANOVA.
 
 Aesthetics include things like size, shape, or color of your points. The same way you think of values of data, think of "levels" of aesthetic settings.
 
-```{r}
+```{r Graph Aesthetics}
 # Example: map the colors of your points to the "class" variable
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, color = class))
@@ -103,10 +103,79 @@ Exercises:
   + Categorical: manufacturer, model, trans, drv, fl, class, cyl
   + Quantitative: displ, year, cty, hwy
 2) Map continuous variable to color, size, and shape 
-```{r}
+```{r 3.3 Exercises}
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = cty, y = hwy, color = year, stroke = displ))
 
 # Continuous variables cannot be mapped to shape, but color and size can!
 # Stroke is the outline/fill of the shape. Size determines the size of the filled part, and Stroke determines the size of the stroke outline
 ```
+### 3.4 Common Problems
+When writing code that needs to continue to another line, denote with "+" at the *end* of the first line. 
+
+Don't understand something about R's functioning? Try typing *?function_name* 
+
+### 3.5 Facets
+Rather than adding in additional variables into your plots, you can add *facets*, which are like subplots that each display one subset of the data
+
+To facet your plot by a single variable, use facet_wrap(), where facet_wrap is followed by a formula "~ variable_name"
+```{r Facets-One Variable}
+library(ggplot2)
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_wrap(~ class, nrow = 2) # nrow denotes how many rows you want all facets to fit into, here it is two rows
+```
+
+You can also facet your plot on the combination of two variables using facet_grid.
+
+```{r Facets-Two Variables}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ cyl) # drv will be on the y axis, while cyl will be on the x-axis
+
+# if you use "." on either side of the ~, you will facet columns or rows only, respectively ( row var ~ column var)
+```
+
+#### 3.5.1 Exercises
+1. What happend if you facet a continuous variable (e.g. year)?
+```{r 3.5.1 Exercises - # 1}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_wrap (~ year, nrow = 4) # for year, it plots 1998 and 2008, which are the min and max years, respsectively, within the dataset
+
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_wrap (~ cty, nrow = 5) # for cty, it graphs one graph per unique item in the continuous
+# unique(mpg$cty) reveals 21 unique "bins" for city mpg, so it plots 21 plots to 5 rows
+```
+
+2. What do the empty cells in plot with facet_grid(drv ~ cyl) mean? How do they relate to this plot?
+```{r 3.5.1 Exercises - # 2}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = drv, y = cyl)) +
+  facet_grid(drv ~ cyl)
+
+# empty cells in plot indicate there is no data there. For instances, there are no 4-wheel or rear-wheel drive cars with 5 cylinders. There are also no cars with 7 cylinders
+```
+3. What plots does the following code make? What does "." do?
+```{r 3.5.1 Exercises - # 3}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(drv ~ .) # using "." plots just facets rows, not columns
+
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(. ~ cyl) # using "." plots just facets columns, not rows
+```
+4. Take the first plot in the section, what are the advantages/advantages to using faceting instead of the color aesthetic? How might you change things if you had a larger dataset?
+```{r 5.3.1 Exercises - # 4}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 2) # allows you to pick out trends within each class without other data crowding, would use this if I found that hwy was significantly different across displ and class
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = class)) # better for seeing trends across classes, overall trends of data
+```
+5. nrow v ncol - can be used in facet wrap since you're telling it how many columns or rows to fit all levels of the wrapped variable within (e.g. 5 x 5). *However*, can't be used for facet grid, rows/columns of which is defined by the unique levels of the data for each variable involved.
+
+6. 
